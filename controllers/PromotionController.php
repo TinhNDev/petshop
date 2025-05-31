@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../services/promotion.service.php';
-
+require_once __DIR__ . '/../middleware/session.middleware.php';
 class PromotionController
 {
     private $service;
@@ -11,6 +11,7 @@ class PromotionController
 
     public function create($data)
     {
+        requireLogin('admin');
         $result = $this->service->createPromotion($data);
         return [
             'status' => $result ? 201 : 400,
@@ -19,6 +20,7 @@ class PromotionController
     }
     public function update($id, $data)
     {
+        requireLogin('admin');
         $result = $this->service->updatePromotion($id, $data);
         return [
             'status' => $result ? 200 : 400,
@@ -45,6 +47,7 @@ class PromotionController
 
     public function findByCode($code)
     {
+        requireLogin(['admin','user']);
         $result = $this->service->findByCode($code);
         return [
             'status' => $result ? 200 : 404,

@@ -9,7 +9,6 @@ class Categories
         $this->conn = $db;
     }
 
-    // Hàm sinh UUID v4
     private function generateID()
     {
         return strtoupper(substr(bin2hex(random_bytes(5)), 0, 10));

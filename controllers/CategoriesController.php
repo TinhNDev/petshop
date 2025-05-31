@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../services/categories.service.php';
-
+require_once __DIR__ . '/../middleware/session.middleware.php';
 class CategoriesController
 {
     private $service;
@@ -30,6 +30,7 @@ class CategoriesController
 
     public function create($data)
     {
+        requireLogin('admin');
         $result = $this->service->createCategory($data);
         return [
             'status' => $result ? 201 : 400,
@@ -39,6 +40,7 @@ class CategoriesController
 
     public function update($id, $data)
     {
+        requireLogin('admin');
         $result = $this->service->updateCategory($id, $data);
         return [
             'status' => $result ? 200 : 400,

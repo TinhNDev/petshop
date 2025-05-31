@@ -116,4 +116,50 @@ class Order
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function countOrders()
+    {
+        $query = "SELECT COUNT(*) as total FROM `order`";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    }
+
+    public function countOrdersByStatus()
+    {
+        $query = "SELECT status, COUNT(*) as total FROM `order` GROUP BY status";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function revenueThisMonth()
+    {
+        $query = "SELECT SUM(total_amount) as revenue FROM `order` 
+                  WHERE status = 'completed' AND MONTH(order_date) = MONTH(CURDATE()) AND YEAR(order_date) = YEAR(CURDATE())";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['revenue'] ?? 0;
+    }
+    public function countActivePromotions()
+    {
+        $query = "SELECT COUNT(*) as total FROM promotion WHERE is_active = 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    }
+    public function countProducts()
+    {
+        $query = "SELECT COUNT(*) as total FROM product";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    }
+    public function countCustomers()
+    {
+        $query = "SELECT COUNT(*) as total FROM user_account WHERE role = 'user'";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    }
 }

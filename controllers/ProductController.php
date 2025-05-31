@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../services/product.service.php';
-
+require_once __DIR__ . '/../middleware/session.middleware.php';
 class ProductController
 {
     private $service;
@@ -13,6 +13,7 @@ class ProductController
 
     public function create($data)
     {
+        requireLogin('admin');
         $result = $this->service->createProduct($data);
         return [
             'status' => $result ? 201 : 400,
@@ -22,6 +23,7 @@ class ProductController
 
     public function update($id, $data)
     {
+        requireLogin('admin');
         $result = $this->service->updateProduct($id, $data);
         return [
             'status' => $result ? 200 : 400,
