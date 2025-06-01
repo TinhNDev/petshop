@@ -29,6 +29,6 @@ class AuthService
             $_SESSION['role'] = $user['role'];
             return $user;
         }
-        return false;
+        return $user;
     }
 }

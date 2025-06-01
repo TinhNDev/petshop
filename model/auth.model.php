@@ -11,16 +11,12 @@ class Auth
 
     public function login($user_name, $password)
     {
-        $query = "SELECT * FROM {$this->table_name} WHERE user_name = :user_name LIMIT 1";
+        $query = "SELECT * FROM {$this->table_name} WHERE user_name = :user_name and password_hash = :password_hash";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':user_name', $user_name);
+        $stmt->bindParam(':password_hash', $password);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($user && password_verify($password, $user['password_hash'])) {
-            unset($user['password_hash']);
-            return $user;
-        }
          return $user;
     }
 }
