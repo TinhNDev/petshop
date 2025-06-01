@@ -68,7 +68,10 @@ class OrderService
             $data['status'] = 'pending';
         }
 
-        $promotionResult = $this->applyPromotion($data['promotion_id'], $data['total_amount']);
+       $promotionResult = $this->applyPromotion(
+            !empty($data['promotion_id']) ? $data['promotion_id'] : null,
+            $data['total_amount']
+        );
         if (!$promotionResult['valid']) {
             return ['success' => false, 'message' => $promotionResult['message']];
         }
@@ -105,7 +108,10 @@ class OrderService
             $data['status'] = 'pending';
         }
 
-        $promotionResult = $this->applyPromotion($data['promotion_id'], $data['total_amount']);
+        $promotionResult = $this->applyPromotion(
+            !empty($data['promotion_id']) ? $data['promotion_id'] : null,
+            $data['total_amount']
+        );
         if (!$promotionResult['valid']) {
             return ['success' => false, 'message' => $promotionResult['message']];
         }
