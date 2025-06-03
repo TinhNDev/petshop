@@ -7,6 +7,8 @@ require_once 'routes/categories.router.php';
 require_once 'routes/cart.router.php';
 require_once 'routes/order.router.php';
 require_once 'routes/auth.router.php';
+require_once 'routes/customer.router.php';
+
 $database = new Database();
 $db = $database->getConnection();
 
@@ -18,6 +20,7 @@ $categoriesRouter = new CategoriesRouter($db);
 $cartRouter = new CartRouter($db);
 $orderRouter = new OrderRouter($db);
 $authRouter = new AuthRouter($db); 
+$customerRouter = new CustomerRouter($db);
 
 $productRouter->addRoutes($router);
 $promotionRouter->addRoutes($router);
@@ -25,5 +28,5 @@ $categoriesRouter->addRoutes($router);
 $cartRouter->addRoutes($router);
 $orderRouter->addRoutes($router);
 $authRouter->addRoutes($router); 
-
+$customerRouter->addRoutes($router);
 $router->dispatch();
