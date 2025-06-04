@@ -26,5 +26,6 @@ class OrderRouter
         $router->addRoute('GET', '/orders/statistics/total-products', 'OrderController', 'countProducts');
         $router->addRoute('GET', '/orders/statistics/total-customers', 'OrderController', 'countCustomers');
         $router->addRoute('GET', '/orders/statistics/all', 'OrderController', 'getAllStatistics');
+        $router->addRoute('GET', '/admin/orders', 'OrderController', 'getAllOrders');
     }
 }

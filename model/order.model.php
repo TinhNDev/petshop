@@ -162,4 +162,11 @@ class Order
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
     }
+    public function getAllOrders()
+    {
+        $query = "SELECT * FROM `order` ORDER BY order_date DESC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

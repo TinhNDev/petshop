@@ -134,4 +134,18 @@ class OrderController
             ]
         ];
     }
+
+    public function getAllOrders()
+    {
+        requireLogin(['admin']);
+        $orders = $this->service->getAllOrders();
+
+        return [
+            'status' => 200,
+            'data' => [
+                'success' => true,
+                'orders' => $orders
+            ]
+        ];
+    }
 }

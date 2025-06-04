@@ -68,7 +68,7 @@ class OrderService
             $data['status'] = 'pending';
         }
 
-       $promotionResult = $this->applyPromotion(
+        $promotionResult = $this->applyPromotion(
             !empty($data['promotion_id']) ? $data['promotion_id'] : null,
             $data['total_amount']
         );
@@ -165,5 +165,10 @@ class OrderService
     public function countCustomers()
     {
         return $this->orderModel->countCustomers();
+    }
+
+    public function getAllOrders()
+    {
+        return $this->orderModel->getAllOrders();
     }
 }
