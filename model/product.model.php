@@ -97,7 +97,9 @@ class Product
 
     public function findAll()
     {
-        $query = "SELECT * FROM {$this->table_name}";
+        $query = "SELECT p.*, c.category_name 
+                  FROM {$this->table_name} p
+                  LEFT JOIN category c ON p.category_id = c.category_id";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

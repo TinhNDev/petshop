@@ -1,6 +1,7 @@
 <?php
 class Database{
     private $host = "127.0.0.1";
+    private $port = "3307"; // Thêm cấu hình port
     private $db_name = "petshop";
     private $username = "root";
     private $password = "123456";
@@ -11,7 +12,7 @@ class Database{
 
         try {
             $this->conn = new PDO(
-                "mysql:host=" . $this->host . ";dbname=" . $this->db_name,
+                "mysql:host=" . $this->host . ";port=" . $this->port . ";dbname=" . $this->db_name,
                 $this->username,
                 $this->password
             );

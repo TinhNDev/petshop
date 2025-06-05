@@ -21,5 +21,15 @@ class CustomerController
             'data' => ['success' => $customer]
         ];
     }
+
+    public function getAllCustomers()
+    {
+        requireLogin(['admin']);
+        $customers = $this->service->getAllCustomers();
+        return [
+            'status' => 200,
+            'data' => ['success' => true, 'customers' => $customers]
+        ];
+    }
 }
 ?>

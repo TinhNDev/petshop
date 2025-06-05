@@ -15,4 +15,8 @@ class CustomerService
         return $this->customerModel->findOne($id);
     }
 
+    public function getAllCustomers()
+    {
+        return $this->customerModel->getAll();
+    }
 }
