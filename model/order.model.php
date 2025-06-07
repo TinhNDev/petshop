@@ -355,16 +355,5 @@ class Order
         
         return $orders;
     }
-    public function updateStock($product_id, $stock)
-{
-    // Đảm bảo stock không âm
-    $stock = max(0, $stock);
-    
-    $query = "UPDATE {$this->table_name} SET stock = :stock WHERE product_id = :product_id";
-    $stmt = $this->conn->prepare($query);
-    $stmt->bindParam(':stock', $stock);
-    $stmt->bindParam(':product_id', $product_id);
-    
-    return $stmt->execute();
-}
+
 }
