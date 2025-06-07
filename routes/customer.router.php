@@ -14,7 +14,8 @@ class CustomerRouter
 
     public function addRoutes($router)
     {
-        $router->addRoute('GET', '/customer/{customer_id}', 'CustomerController', 'getCustomer');
+        $router->addRoute('GET', '/customer', 'CustomerController', 'getCustomer');
         $router->addRoute('GET', '/customers', 'CustomerController', 'getAllCustomers');
+         $router->addRoute('POST', '/password/change', 'CustomerController', 'changePassword');
     }
 }

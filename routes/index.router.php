@@ -16,11 +16,21 @@ class Router
 
     public function dispatch()
     {
-        header("Access-Control-Allow-Origin: *");
+        $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+        $allowed_origins = [
+            'http://localhost:8080',
+            'http://127.0.0.1:8080',
+            'https://9ad9-116-110-40-129.ngrok-free.app'
+        ];
+        if (in_array($origin, $allowed_origins)) {
+            header("Access-Control-Allow-Origin: $origin");
+        } else {
+            header("Access-Control-Allow-Origin: {$allowed_origins[0]}");
+        }
         header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
         header("Access-Control-Allow-Headers: Content-Type, Authorization");
         header('Content-Type: application/json; charset=utf-8');
-
+        header('Access-Control-Allow-Credentials: true');
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
             http_response_code(200);
             exit();

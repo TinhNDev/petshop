@@ -138,4 +138,81 @@ class Product
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+        public function updateStock($product_id, $stock)
+{
+    // Đảm bảo stock không âm
+    $stock = max(0, $stock);
+    
+    $query = "UPDATE {$this->table_name} SET stock = :stock WHERE product_id = :product_id";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(':stock', $stock);
+    $stmt->bindParam(':product_id', $product_id);
+    
+    return $stmt->execute();
+}
+/**
+ * Lấy danh sách sản phẩm bán chạy nhất
+ * 
+ * @param int $limit Số lượng sản phẩm muốn lấy
+ * @return array Danh sách sản phẩm
+ */
+/**
+ * Lấy danh sách sản phẩm ngẫu nhiên
+ * 
+ * @param int $limit Số lượng sản phẩm muốn lấy
+ * @return array Danh sách sản phẩm
+ */
+public function getBestSellingProducts($limit = 3)
+{
+    try {
+        // Thay vì sắp xếp theo số lượng bán, chúng ta sắp xếp ngẫu nhiên
+        $query = "SELECT p.product_id as id, p.product_name as name, 
+                    CASE 
+                        WHEN p.discount_price > 0 THEN p.discount_price 
+                        ELSE p.base_price 
+                    END as price,
+                    p.image_url as image, 
+                    c.category_name as category,
+                    p.description,
+                    p.stock
+                  FROM {$this->table_name} p
+                  LEFT JOIN category c ON p.category_id = c.category_id
+                  WHERE p.is_active = 1 AND p.stock > 0
+                  ORDER BY RAND() 
+                  LIMIT :limit";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(':limit', (int) $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        error_log("Error getting random products: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Kiểm tra sản phẩm có trong danh sách yêu thích của người dùng hay không
+ * 
+ * @param string $product_id ID sản phẩm
+ * @param string $user_id ID người dùng
+ * @return boolean
+ */
+public function isProductFavorited($product_id, $user_id)
+{
+    try {
+        $query = "SELECT COUNT(*) FROM wishlist 
+                  WHERE product_id = :product_id AND user_id = :user_id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':product_id', $product_id);
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->execute();
+        
+        return (int)$stmt->fetchColumn() > 0;
+    } catch (Exception $e) {
+        error_log("Error checking favorite status: " . $e->getMessage());
+        return false;
+    }
+}
 }

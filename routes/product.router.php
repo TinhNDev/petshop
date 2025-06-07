@@ -14,6 +14,8 @@ class ProductRouter
 
     public function addRoutes($router)
     {
+        $router->addRoute('GET', '/products/bestsellers', 'ProductController', 'getBestSellingProducts');
+
         $router->addRoute('GET', '/products', 'ProductController', 'getAll');
         $router->addRoute('GET', '/products/{id}', 'ProductController', 'getDetail');
         $router->addRoute('POST', '/products', 'ProductController', 'create');

@@ -16,9 +16,10 @@ class OrderRouter
     {
         $router->addRoute('POST', '/orders/cart', 'OrderController', 'createOrderFromCart');
         $router->addRoute('POST', '/orders/buynow', 'OrderController', 'buyNow');
-        $router->addRoute('GET', '/orders/customer/{customer_id}', 'OrderController', 'getAllOrdersByCustomer');
+        $router->addRoute('GET', '/orders/filter', 'OrderController', 'filterOrders');
+        $router->addRoute('GET', '/orders/customer', 'OrderController', 'getAllOrdersByCustomer');
         $router->addRoute('GET', '/orders/{order_id}', 'OrderController', 'getOrderDetail');
-
+        
         $router->addRoute('GET', '/orders/statistics/total', 'OrderController', 'countOrders');
         $router->addRoute('GET', '/orders/statistics/by-status', 'OrderController', 'countOrdersByStatus');
         $router->addRoute('GET', '/orders/statistics/revenue-this-month', 'OrderController', 'revenueThisMonth');

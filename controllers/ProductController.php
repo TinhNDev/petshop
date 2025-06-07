@@ -64,5 +64,32 @@ class ProductController
             'data' => $result
         ];
     }
+    public function getBestSellingProducts()
+    {
+        // Lấy user_id từ session nếu đã đăng nhập
+        $user_id = null;
+        if (isset($_SESSION['user_id'])) {
+            $user_id = $_SESSION['user_id'];
+        }
+        
+        // Lấy limit từ query parameters nếu có
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 3;
+        
+        // Giới hạn số lượng sản phẩm tối đa
+        if ($limit <= 0 || $limit > 20) {
+            $limit = 3;
+        }
+        
+        // Lấy danh sách sản phẩm bán chạy
+        $products = $this->service->getBestSellingProducts($user_id, $limit);
+        
+        return [
+            'status' => 200,
+            'data' => [
+                'success' => true,
+                'products' => $products
+            ]
+        ];
+    }
 }
 ?>

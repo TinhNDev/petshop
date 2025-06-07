@@ -176,10 +176,12 @@ class Order
 
     public function getOrderDetail($order_id)
     {
-        $query = "SELECT o.*, od.order_detail_id, od.product_id, od.quantity, od.unit_price, p.product_name
+        $query = "SELECT o.*, od.order_detail_id, od.product_id, od.quantity, od.unit_price, 
+                  p.product_name, p.image_url as image, c.category_name as category
                   FROM `order` o
                   JOIN order_detail od ON od.order_id = o.order_id
                   JOIN product p ON p.product_id = od.product_id
+                  LEFT JOIN category c ON p.category_id = c.category_id
                   WHERE o.order_id = :order_id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':order_id', $order_id);
@@ -239,4 +241,130 @@ class Order
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function filterOrders($filters = [])
+    {
+        $query = "SELECT 
+            o.order_id, 
+            o.order_date, 
+            o.status, 
+            o.total_amount,
+            o.payment_method, 
+            o.payment_status,
+            c.customer_name, 
+            c.phone,
+            a.address_line, 
+            a.ward_id,
+            COUNT(od.product_id) as total_items
+          FROM `order` o
+          JOIN customer c ON o.customer_id = c.customer_id
+          JOIN address a ON o.address_id = a.address_id
+          LEFT JOIN order_detail od ON o.order_id = od.order_id
+          WHERE 1=1";
+        
+        $params = [];
+        
+        // Lọc theo payment_status
+        if (isset($filters['payment_status']) && $filters['payment_status'] !== '') {
+            $query .= " AND o.payment_status = :payment_status";
+            $params[':payment_status'] = $filters['payment_status'];
+        }
+        
+        // Lọc theo status
+        if (isset($filters['status']) && $filters['status'] !== '') {
+            $query .= " AND o.status = :status";
+            $params[':status'] = $filters['status'];
+        }
+        
+        // Lọc theo customer_id (nếu cần)
+        if (isset($filters['customer_id']) && $filters['customer_id'] !== '') {
+            $query .= " AND o.customer_id = :customer_id";
+            $params[':customer_id'] = $filters['customer_id'];
+        }
+        
+        // Lọc theo khoảng thời gian (nếu cần)
+        if (isset($filters['start_date']) && $filters['start_date'] !== '') {
+            $query .= " AND o.order_date >= :start_date";
+            $params[':start_date'] = $filters['start_date'];
+        }
+        
+        if (isset($filters['end_date']) && $filters['end_date'] !== '') {
+            $query .= " AND o.order_date <= :end_date";
+            $params[':end_date'] = $filters['end_date'];
+        }
+        
+        $query .= " GROUP BY o.order_id, o.order_date, o.status, o.total_amount, 
+                  o.payment_method, o.payment_status, c.customer_name, 
+                  c.phone, a.address_line, a.ward_id
+                  ORDER BY o.order_date DESC";
+        
+        $stmt = $this->conn->prepare($query);
+        
+        // Bind các tham số
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+        
+        $stmt->execute();
+        $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($orders as &$order) {
+            $detailQuery = "SELECT 
+                          od.product_id,
+                          od.quantity as count,
+                          od.unit_price as price,
+                          p.product_name as name,
+                          p.stock as quantity,
+                          p.image_url,
+                          c.category_name as category
+                        FROM order_detail od
+                        JOIN product p ON od.product_id = p.product_id
+                        LEFT JOIN category c ON p.category_id = c.category_id
+                        WHERE od.order_id = :order_id";
+    
+            $detailStmt = $this->conn->prepare($detailQuery);
+            $detailStmt->bindParam(':order_id', $order['order_id']);
+            $detailStmt->execute();
+            $items = $detailStmt->fetchAll(PDO::FETCH_ASSOC);
+    
+            foreach ($items as &$item) {
+                $item['price'] = number_format($item['price'], 0, ',', '.');
+                $item['count'] = (string) $item['count'];
+                $item['quantity'] = (string) $item['quantity'];
+                $item['image'] = $item['image_url'];
+                unset($item['image_url']);
+            }
+    
+            $order['items'] = $items;
+            $order['id'] = $order['order_id'];
+            $order['total'] = number_format($order['total_amount'], 0, ',', '.') . 'đ';
+    
+            if (!empty($items)) {
+                $firstItem = $items[0];
+                $order['image'] = $firstItem['image'];
+                $order['name'] = $firstItem['name'];
+                $order['category'] = $firstItem['category'];
+                $order['quantity'] = $firstItem['quantity'];
+                $order['count'] = $firstItem['count'];
+                $order['price'] = $firstItem['price'];
+    
+                $numericPrice = (int) str_replace('.', '', $firstItem['price']);
+                $numericCount = (int) $firstItem['count'];
+                $order['total'] = number_format($numericPrice * $numericCount, 0, ',', '.') . 'đ';
+            }
+        }
+        
+        return $orders;
+    }
+    public function updateStock($product_id, $stock)
+{
+    // Đảm bảo stock không âm
+    $stock = max(0, $stock);
+    
+    $query = "UPDATE {$this->table_name} SET stock = :stock WHERE product_id = :product_id";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(':stock', $stock);
+    $stmt->bindParam(':product_id', $product_id);
+    
+    return $stmt->execute();
+}
 }
